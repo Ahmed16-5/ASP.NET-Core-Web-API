@@ -1,5 +1,7 @@
 using ASP.NET_Core_Web_API.Data;
 using ASP.NET_Core_Web_API.Services;
+using ASP.NET_Core_Web_API.Interfaces;
+using ASP.NET_Core_Web_API.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -15,19 +17,43 @@ namespace ASP.NET_Core_Web_API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add DbContext
+            // Database
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection")
-                ));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Add Authentication Services
+            // Repositories
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            // Services
             builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IStudyGroupService, StudyGroupService>();
+            builder.Services.AddScoped<IMaterialService, MaterialService>();
+            builder.Services.AddScoped<ICommentService, CommentService>();
+            builder.Services.AddScoped<IJoinRequestService, JoinRequestService>();
 
-            // Configure JWT Authentication
+            // CORS - React only
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp", policy =>
+                {
+                    policy.WithOrigins(
+                            "http://localhost:3000",
+                            "http://localhost:5173"
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
+            // JWT
             var jwtSettings = builder.Configuration.GetSection("Jwt");
-            var secretKey = jwtSettings["SecretKey"] ?? "your-secret-key-min-32-chars-long";
-            var key = Encoding.ASCII.GetBytes(secretKey);
+            var secretKey = jwtSettings["SecretKey"];
+
+            if (string.IsNullOrEmpty(secretKey))
+                throw new Exception("JWT SecretKey is missing in appsettings.json");
+
+            var key = Encoding.UTF8.GetBytes(secretKey);
 
             builder.Services.AddAuthentication(options =>
             {
@@ -38,61 +64,71 @@ namespace ASP.NET_Core_Web_API
             {
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
+
                     ValidateIssuer = true,
-                    ValidIssuer = jwtSettings["Issuer"] ?? "StudyGroupAPI",
+                    ValidIssuer = jwtSettings["Issuer"],
+
                     ValidateAudience = true,
-                    ValidAudience = jwtSettings["Audience"] ?? "StudyGroupAPIUsers",
+                    ValidAudience = jwtSettings["Audience"],
+
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
             });
 
-            // Add Authorization
             builder.Services.AddAuthorization();
 
-            // Add services to the container
+            // Controllers
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
-                    // Prevent possible object reference cycles when serializing entities with navigation properties
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 });
+
             builder.Services.AddEndpointsApiExplorer();
 
-            // Configure Swagger with JWT support
+            // Swagger + JWT
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Study Group API", Version = "v1" });
-
-                var securityScheme = new OpenApiSecurityScheme
+                c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Name = "JWT Authentication",
-                    Description = "Enter a valid JWT token",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    Reference = new OpenApiReference
-                    {
-                        Id = JwtBearerDefaults.AuthenticationScheme,
-                        Type = ReferenceType.SecurityScheme
-                    }
-                };
+                    Title = "Study Group API",
+                    Version = "v1"
+                });
 
-                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityScheme);
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter: Bearer {your JWT token}"
+                });
+
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    { securityScheme, new[] { "Bearer" } }
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
                 });
             });
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -101,7 +137,8 @@ namespace ASP.NET_Core_Web_API
 
             app.UseHttpsRedirection();
 
-            // Add Authentication middleware
+            app.UseCors("AllowReactApp");
+
             app.UseAuthentication();
             app.UseAuthorization();
 
