@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using System.Text;
 
+
 namespace ASP.NET_Core_Web_API
 {
     public class Program
@@ -88,6 +89,7 @@ namespace ASP.NET_Core_Web_API
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
             builder.Services.AddEndpointsApiExplorer();

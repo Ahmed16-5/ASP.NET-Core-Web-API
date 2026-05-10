@@ -4,6 +4,7 @@ using ASP.NET_Core_Web_API.models;
 using ASP.NET_Core_Web_API.DTOs;
 using ASP.NET_Core_Web_API.Services;
 using ASP.NET_Core_Web_API.Interfaces;
+using ASP.NET_Core_Web_API.Enums;
 
 namespace ASP.NET_Core_Web_API.Controllers
 {
@@ -21,9 +22,6 @@ namespace ASP.NET_Core_Web_API.Controllers
             _authService = authService;
         }
 
-        
-        /// Get all join requests (Admin only or group owner)
-        
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAllJoinRequests()
@@ -31,43 +29,45 @@ namespace ASP.NET_Core_Web_API.Controllers
             var currentUserId = _authService.GetUserIdFromClaims(User);
             var userRole = _authService.GetUserRoleFromClaims(User);
 
+            if (userRole != UserRole.Admin)
+                return Forbid();
+
             var requests = await _joinRequestService.GetAllJoinRequestsAsync(currentUserId, userRole);
+
             return Ok(requests);
         }
 
-        
-        /// Get join request by ID
-        
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetJoinRequestById(int id)
         {
             var request = await _joinRequestService.GetJoinRequestByIdAsync(id);
+
             if (request == null)
                 return NotFound(new { message = "Join request not found" });
 
             return Ok(request);
         }
 
-       
-        /// Send join request to study group
-        
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> SendJoinRequest([FromBody] SendJoinRequestDto sendDto)
         {
             var userId = _authService.GetUserIdFromClaims(User);
+
             var joinRequest = await _joinRequestService.SendJoinRequestAsync(sendDto.StudyGroupID, userId);
 
             if (joinRequest == null)
-                return BadRequest(new { message = "You are already a member of this group or have a pending request" });
+                return BadRequest(new
+                {
+                    message = "You are already a member of this group or have a pending request"
+                });
 
-            return CreatedAtAction(nameof(GetJoinRequestById), new { id = joinRequest.ID }, joinRequest);
+            return CreatedAtAction(nameof(GetJoinRequestById),
+                new { id = joinRequest.ID },
+                joinRequest);
         }
 
-        
-        /// Approve join request (group owner or admin only)
-        
         [HttpPut("{id}/approve")]
         [Authorize]
         public async Task<IActionResult> ApproveJoinRequest(int id)
@@ -75,16 +75,22 @@ namespace ASP.NET_Core_Web_API.Controllers
             var currentUserId = _authService.GetUserIdFromClaims(User);
             var userRole = _authService.GetUserRoleFromClaims(User);
 
-            var joinRequest = await _joinRequestService.ApproveJoinRequestAsync(id, currentUserId, userRole);
-            if (joinRequest == null)
-                return NotFound(new { message = "Join request not found or cannot be approved" });
+            var joinRequest = await _joinRequestService
+                .ApproveJoinRequestAsync(id, currentUserId, userRole);
 
-            return Ok(new { message = "Join request approved", joinRequest });
+            if (joinRequest == null)
+                return NotFound(new
+                {
+                    message = "Join request not found, cannot be approved, or group is full"
+                });
+
+            return Ok(new
+            {
+                message = "Join request approved successfully",
+                joinRequest
+            });
         }
 
-        
-        /// Reject join request (group owner or admin only)
-        
         [HttpPut("{id}/reject")]
         [Authorize]
         public async Task<IActionResult> RejectJoinRequest(int id)
@@ -92,32 +98,40 @@ namespace ASP.NET_Core_Web_API.Controllers
             var currentUserId = _authService.GetUserIdFromClaims(User);
             var userRole = _authService.GetUserRoleFromClaims(User);
 
-            var joinRequest = await _joinRequestService.RejectJoinRequestAsync(id, currentUserId, userRole);
-            if (joinRequest == null)
-                return NotFound(new { message = "Join request not found or cannot be rejected" });
+            var joinRequest = await _joinRequestService
+                .RejectJoinRequestAsync(id, currentUserId, userRole);
 
-            return Ok(new { message = "Join request rejected", joinRequest });
+            if (joinRequest == null)
+                return NotFound(new
+                {
+                    message = "Join request not found, already processed, or you don't have permission"
+                });
+
+            return Ok(new
+            {
+                message = "Join request rejected successfully",
+                joinRequest
+            });
         }
 
-        
-        /// Cancel own join request
-        
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> CancelJoinRequest(int id)
         {
             var currentUserId = _authService.GetUserIdFromClaims(User);
 
-            var success = await _joinRequestService.CancelJoinRequestAsync(id, currentUserId);
+            var success = await _joinRequestService
+                .CancelJoinRequestAsync(id, currentUserId);
+
             if (!success)
-                return NotFound(new { message = "Join request not found or cannot be cancelled" });
+                return NotFound(new
+                {
+                    message = "Join request not found or cannot be cancelled"
+                });
 
             return Ok(new { message = "Join request cancelled" });
         }
 
-        
-        /// Get pending join requests for a study group
-        
         [HttpGet("group/{studyGroupId}/pending")]
         [Authorize]
         public async Task<IActionResult> GetPendingRequestsForGroup(int studyGroupId)
@@ -125,19 +139,21 @@ namespace ASP.NET_Core_Web_API.Controllers
             var currentUserId = _authService.GetUserIdFromClaims(User);
             var userRole = _authService.GetUserRoleFromClaims(User);
 
-            var pendingRequests = await _joinRequestService.GetPendingRequestsForGroupAsync(studyGroupId, currentUserId, userRole);
+            var pendingRequests = await _joinRequestService
+                .GetPendingRequestsForGroupAsync(studyGroupId, currentUserId, userRole);
+
             return Ok(pendingRequests);
         }
 
-        
-        /// Get user's join requests
-        
         [HttpGet("user/my-requests")]
         [Authorize]
         public async Task<IActionResult> GetMyJoinRequests()
         {
             var userId = _authService.GetUserIdFromClaims(User);
-            var requests = await _joinRequestService.GetUserJoinRequestsAsync(userId);
+
+            var requests = await _joinRequestService
+                .GetUserJoinRequestsAsync(userId);
+
             return Ok(requests);
         }
     }

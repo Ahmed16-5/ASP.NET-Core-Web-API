@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using ASP.NET_Core_Web_API.Data;
 using ASP.NET_Core_Web_API.models;
 using ASP.NET_Core_Web_API.DTOs;
+using ASP.NET_Core_Web_API.Enums;
 
 namespace ASP.NET_Core_Web_API.Services
 {
@@ -46,6 +47,12 @@ namespace ASP.NET_Core_Web_API.Services
                 return null;
             }
 
+
+            if (registerDto.Role == UserRole.Admin)
+            {
+                return null;
+            }
+
             // Check if user already exists
             var existingUser = _context.Users.FirstOrDefault(u => u.Email == registerDto.Email);
             if (existingUser != null)
@@ -58,9 +65,9 @@ namespace ASP.NET_Core_Web_API.Services
                 Name = registerDto.Name,
                 Email = registerDto.Email,
                 PasswordHash = HashPassword(registerDto.Password),
-                Role = "User", // Default role
+                Role = registerDto.Role,
                 CreatedAt = DateTime.UtcNow,
-                IsApproved = false // New users need admin approval
+                IsApproved = registerDto.Role == UserRole.Student
             };
 
             _context.Users.Add(user);
@@ -130,7 +137,7 @@ namespace ASP.NET_Core_Web_API.Services
             {
                 new System.Security.Claims.Claim("UserId", user.ID.ToString()),
                 new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, user.Email ?? ""),
-                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, user.Role ?? "User"),
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, user.Role.ToString()),
                 new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.Name ?? "")
             };
 
@@ -157,10 +164,17 @@ namespace ASP.NET_Core_Web_API.Services
         }
 
         // Get user role from claims
-        public string GetUserRoleFromClaims(System.Security.Claims.ClaimsPrincipal user)
+        public UserRole GetUserRoleFromClaims(System.Security.Claims.ClaimsPrincipal user)
         {
             var roleClaim = user.FindFirst(System.Security.Claims.ClaimTypes.Role);
-            return roleClaim?.Value ?? "User";
+
+            if (roleClaim != null &&
+                Enum.TryParse<UserRole>(roleClaim.Value, true, out var role))
+            {
+                return role;
+            }
+
+            return UserRole.Student;
         }
     }
 }

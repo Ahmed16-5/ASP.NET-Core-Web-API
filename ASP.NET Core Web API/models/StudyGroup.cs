@@ -1,12 +1,14 @@
-﻿namespace ASP.NET_Core_Web_API.models
+﻿using ASP.NET_Core_Web_API.Enums;
+
+namespace ASP.NET_Core_Web_API.models
 {
     public class StudyGroup
     {
         public int ID { get; set; }
         public DateTime CreatedAt { get; set; }
-        public bool IsApproved { get; set; }
+        public GroupApprovalStatus ApprovalStatus { get; set; }
         public DateTime MeetingTime { get; set; }
-        public string? MeetingType { get; set; }
+        public MeetingType MeetingType { get; set; }
         public int MaxMembers { get; set; }
         public string? Location { get; set; }
         public string? Description { get; set; }

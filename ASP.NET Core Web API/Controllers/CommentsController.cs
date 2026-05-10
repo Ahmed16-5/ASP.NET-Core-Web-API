@@ -4,6 +4,7 @@ using ASP.NET_Core_Web_API.models;
 using ASP.NET_Core_Web_API.DTOs;
 using ASP.NET_Core_Web_API.Services;
 using ASP.NET_Core_Web_API.Interfaces;
+using ASP.NET_Core_Web_API.Enums;
 
 namespace ASP.NET_Core_Web_API.Controllers
 {

@@ -3,12 +3,12 @@ using ASP.NET_Core_Web_API.Data;
 using ASP.NET_Core_Web_API.Interfaces;
 using ASP.NET_Core_Web_API.DTOs;
 using ASP.NET_Core_Web_API.models;
+using ASP.NET_Core_Web_API.Enums;
 
 namespace ASP.NET_Core_Web_API.Services
 {
-     
     /// Material service implementation for material-related business logic
-     
+
     public class MaterialService : IMaterialService
     {
         private readonly AppDbContext _context;
@@ -20,9 +20,8 @@ namespace ASP.NET_Core_Web_API.Services
             _repository = repository;
         }
 
-         
         /// Get all materials for a study group
-         
+
         public async Task<IEnumerable<Material>> GetMaterialsByGroupAsync(int studyGroupId)
         {
             return await _context.Materials
@@ -31,9 +30,8 @@ namespace ASP.NET_Core_Web_API.Services
                 .ToListAsync();
         }
 
-         
         /// Get material by ID
-         
+
         public async Task<Material> GetMaterialByIdAsync(int id)
         {
             return await _context.Materials
@@ -42,9 +40,8 @@ namespace ASP.NET_Core_Web_API.Services
                 .FirstOrDefaultAsync(m => m.ID == id);
         }
 
-         
         /// Create new material
-         
+
         public async Task<Material> CreateMaterialAsync(CreateMaterialDto createDto, int studyGroupId, int userId)
         {
             var material = new Material
@@ -59,10 +56,13 @@ namespace ASP.NET_Core_Web_API.Services
             return await _repository.AddAsync(material);
         }
 
-         
         /// Update material
-         
-        public async Task<Material> UpdateMaterialAsync(int id, CreateMaterialDto updateDto, int currentUserId, string userRole)
+
+        public async Task<Material> UpdateMaterialAsync(
+            int id,
+            CreateMaterialDto updateDto,
+            int currentUserId,
+            UserRole userRole)
         {
             var material = await _context.Materials
                 .Include(m => m.StudyGroup)
@@ -72,9 +72,10 @@ namespace ASP.NET_Core_Web_API.Services
                 return null;
 
             // Only creator, group owner, or admin can update
-            bool canUpdate = material.UserID == currentUserId ||
-                           material.StudyGroup.UserID == currentUserId ||
-                           userRole == "Admin";
+            bool canUpdate =
+                material.UserID == currentUserId ||
+                material.StudyGroup.UserID == currentUserId ||
+                userRole == UserRole.Admin;
 
             if (!canUpdate)
                 return null;
@@ -85,10 +86,12 @@ namespace ASP.NET_Core_Web_API.Services
             return await _repository.UpdateAsync(material);
         }
 
-         
         /// Delete material
-         
-        public async Task<bool> DeleteMaterialAsync(int id, int currentUserId, string userRole)
+
+        public async Task<bool> DeleteMaterialAsync(
+            int id,
+            int currentUserId,
+            UserRole userRole)
         {
             var material = await _context.Materials
                 .Include(m => m.StudyGroup)
@@ -98,22 +101,23 @@ namespace ASP.NET_Core_Web_API.Services
                 return false;
 
             // Only creator, group owner, or admin can delete
-            bool canDelete = material.UserID == currentUserId ||
-                           material.StudyGroup.UserID == currentUserId ||
-                           userRole == "Admin";
+            bool canDelete =
+                material.UserID == currentUserId ||
+                material.StudyGroup.UserID == currentUserId ||
+                userRole == UserRole.Admin;
 
             if (!canDelete)
                 return false;
 
             _context.Materials.Remove(material);
+
             await _context.SaveChangesAsync();
 
             return true;
         }
 
-         
         /// Get materials uploaded by user
-         
+
         public async Task<IEnumerable<Material>> GetUserMaterialsAsync(int userId)
         {
             return await _context.Materials
@@ -122,9 +126,8 @@ namespace ASP.NET_Core_Web_API.Services
                 .ToListAsync();
         }
 
-         
         /// Search materials by filename
-         
+
         public async Task<IEnumerable<Material>> SearchMaterialsAsync(string searchTerm)
         {
             return await _context.Materials
@@ -134,9 +137,8 @@ namespace ASP.NET_Core_Web_API.Services
                 .ToListAsync();
         }
 
-         
         /// Check if material exists
-         
+
         public async Task<bool> MaterialExistsAsync(int id)
         {
             return await _repository.ExistsAsync(id);

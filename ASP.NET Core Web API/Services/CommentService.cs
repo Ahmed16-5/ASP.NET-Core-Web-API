@@ -3,6 +3,7 @@ using ASP.NET_Core_Web_API.Data;
 using ASP.NET_Core_Web_API.Interfaces;
 using ASP.NET_Core_Web_API.DTOs;
 using ASP.NET_Core_Web_API.models;
+using ASP.NET_Core_Web_API.Enums;
 
 namespace ASP.NET_Core_Web_API.Services
 {
@@ -59,14 +60,14 @@ namespace ASP.NET_Core_Web_API.Services
 
         /// Update comment
 
-        public async Task<Comment> UpdateCommentAsync(int id, CreateCommentDto updateDto, int currentUserId, string userRole)
+        public async Task<Comment> UpdateCommentAsync(int id, CreateCommentDto updateDto, int currentUserId, UserRole userRole)
         {
             var comment = await _repository.GetByIdAsync(id);
             if (comment == null)
                 return null;
 
             // Only comment owner or admin can update
-            if (comment.UserID != currentUserId && userRole != "Admin")
+            if (comment.UserID != currentUserId && userRole != UserRole.Admin)
                 return null;
 
             comment.Content = updateDto.Content;
@@ -75,7 +76,7 @@ namespace ASP.NET_Core_Web_API.Services
         }
 
         /// Delete comment
-        public async Task<bool> DeleteCommentAsync(int id, int currentUserId, string userRole)
+        public async Task<bool> DeleteCommentAsync(int id, int currentUserId, UserRole userRole)
         {
             var comment = await _context.Comments
                 .Include(c => c.StudyGroup)
@@ -87,7 +88,7 @@ namespace ASP.NET_Core_Web_API.Services
             // Only comment owner, group owner, or admin can delete
             bool canDelete = comment.UserID == currentUserId ||
                            comment.StudyGroup?.UserID == currentUserId ||
-                           userRole == "Admin";
+                           userRole == UserRole.Admin;
 
             if (!canDelete)
                 return false;

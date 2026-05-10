@@ -35,6 +35,7 @@ namespace ASP.NET_Core_Web_API.Data
                 .IsRequired();
             modelBuilder.Entity<User>()
                 .Property(u => u.Role)
+                .HasConversion<string>()
                 .HasMaxLength(50);
 
             // Configure StudyGroup entity
@@ -51,6 +52,12 @@ namespace ASP.NET_Core_Web_API.Data
                 .HasMaxLength(500);
             modelBuilder.Entity<StudyGroup>()
                 .Property(sg => sg.MeetingType)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<StudyGroup>()
+                .Property(sg => sg.ApprovalStatus)
+                .HasConversion<string>()
                 .HasMaxLength(50);
 
             // Configure StudyGroup - User relationship
@@ -65,6 +72,7 @@ namespace ASP.NET_Core_Web_API.Data
                 .HasKey(jr => jr.ID);
             modelBuilder.Entity<JoinRequest>()
                 .Property(jr => jr.Status)
+                .HasConversion<string>()
                 .HasMaxLength(50);
 
             // Configure JoinRequest - User relationship

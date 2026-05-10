@@ -1,12 +1,15 @@
-﻿namespace ASP.NET_Core_Web_API.models
+﻿using ASP.NET_Core_Web_API.Enums;
+using System.Text.Json.Serialization;
+namespace ASP.NET_Core_Web_API.models
 {
     public class User
     {
         public int ID { get; set; }
         public string? Name { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string? Role { get; set; }
+        public UserRole Role { get; set; }
         public string? Email { get; set; }
+        [JsonIgnore]
         public string? PasswordHash { get; set; }
         public bool IsApproved { get; set; }
 

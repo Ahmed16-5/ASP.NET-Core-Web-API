@@ -1,5 +1,6 @@
 using ASP.NET_Core_Web_API.DTOs;
 using ASP.NET_Core_Web_API.models;
+using ASP.NET_Core_Web_API.Enums;
 
 namespace ASP.NET_Core_Web_API.Interfaces
 {
@@ -25,12 +26,12 @@ namespace ASP.NET_Core_Web_API.Interfaces
 
         /// Update comment
 
-        Task<Comment> UpdateCommentAsync(int id, CreateCommentDto updateDto, int currentUserId, string userRole);
+        Task<Comment> UpdateCommentAsync(int id, CreateCommentDto updateDto, int currentUserId, UserRole userRole);
 
 
         /// Delete comment
 
-        Task<bool> DeleteCommentAsync(int id, int currentUserId, string userRole);
+        Task<bool> DeleteCommentAsync(int id, int currentUserId, UserRole userRole);
 
 
         /// Get comments by current user

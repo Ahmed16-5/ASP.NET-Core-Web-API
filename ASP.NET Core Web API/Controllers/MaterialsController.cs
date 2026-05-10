@@ -4,6 +4,7 @@ using ASP.NET_Core_Web_API.models;
 using ASP.NET_Core_Web_API.DTOs;
 using ASP.NET_Core_Web_API.Services;
 using ASP.NET_Core_Web_API.Interfaces;
+using ASP.NET_Core_Web_API.Enums;
 
 namespace ASP.NET_Core_Web_API.Controllers
 {
@@ -77,7 +78,7 @@ namespace ASP.NET_Core_Web_API.Controllers
 
             var material = await _materialService.UpdateMaterialAsync(id, updateDto, currentUserId, userRole);
             if (material == null)
-                return NotFound(new { message = "Material not found" });
+                return NotFound(new { message = "Material not found or you don't have permission to update it" });
 
             return Ok(new { message = "Material updated successfully", material });
         }
@@ -94,7 +95,7 @@ namespace ASP.NET_Core_Web_API.Controllers
 
             var success = await _materialService.DeleteMaterialAsync(id, currentUserId, userRole);
             if (!success)
-                return NotFound(new { message = "Material not found" });
+                return NotFound(new { message = "Material not found or you don't have permission to delete it" });
 
             return Ok(new { message = "Material deleted successfully" });
         }
