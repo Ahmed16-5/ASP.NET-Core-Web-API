@@ -1,98 +1,73 @@
-Study Group API - ASP.NET Core Web API
+# Study Group API - ASP.NET Core Web API
 
-  
+![.NET 8](https://img.shields.io/badge/.NET-8.0-blue) ![SQL Server](https://img.shields.io/badge/Database-SQL%20Server-red) ![License](https://img.shields.io/badge/License-MIT-green)
 
-📌 Project Overview
+## 📌 Project Overview
 
-Study Group API is a backend REST API service designed to facilitate the creation and management of study groups. It provides features for user authentication, authorization, and study group management with an admin approval system.
+**Study Group API** is a backend REST API service designed to facilitate the creation and management of study groups. It provides features for user authentication, authorization, and study group management with an admin approval system.
 
-Main Features
+### Main Features
 
-✅ User Authentication - Secure registration and login with JWT tokens✅ Role-Based Authorization - Admin and User roles with different permissions✅ Admin Approval System - New users and study groups require admin approval✅ Study Group Management - Create, update, delete, and search study groups✅ Study Group Members - Join requests and member management✅ Materials & Comments - Attach study materials and leave comments in study groups✅ Secure API - Protected endpoints using JWT Bearer tokens
+✅ **User Authentication** - Secure registration and login with JWT tokens  
+✅ **Role-Based Authorization** - Admin and User roles with different permissions  
+✅ **Admin Approval System** - New users and study groups require admin approval  
+✅ **Study Group Management** - Create, update, delete, and search study groups  
+✅ **Study Group Members** - Join requests and member management  
+✅ **Materials & Comments** - Attach study materials and leave comments in study groups  
+✅ **Secure API** - Protected endpoints using JWT Bearer tokens  
 
-🛠️ Technologies Used
+---
 
-Technology
+## 🛠️ Technologies Used
 
-Version
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| .NET | 8.0 | Framework |
+| ASP.NET Core | 8.0 | Web API Framework |
+| Entity Framework Core | Latest | ORM (Object-Relational Mapping) |
+| SQL Server | 2019+ | Database |
+| JWT (JSON Web Tokens) | System.IdentityModel.Tokens.Jwt | Authentication |
+| Swagger/Swashbuckle | Latest | API Documentation |
 
-Purpose
+---
 
-.NET
+## ⚙️ Installation & Setup
 
-8.0
-
-Framework
-
-ASP.NET Core
-
-8.0
-
-Web API Framework
-
-Entity Framework Core
-
-Latest
-
-ORM (Object-Relational Mapping)
-
-SQL Server
-
-2019+
-
-Database
-
-JWT (JSON Web Tokens)
-
-System.IdentityModel.Tokens.Jwt
-
-Authentication
-
-Swagger/Swashbuckle
-
-Latest
-
-API Documentation
-
-⚙️ Installation & Setup
-
-Prerequisites
+### Prerequisites
 
 Before you start, ensure you have installed:
 
-Visual Studio 2022+ or Visual Studio Code
+- **Visual Studio 2022+** or **Visual Studio Code**
+- **.NET 8 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/8.0)
+- **SQL Server 2019+** - [Download here](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
+- **Git** - [Download here](https://git-scm.com/)
 
-.NET 8 SDK - Download here
+### Step-by-Step Setup
 
-SQL Server 2019+ - Download here
+#### 1. Clone the Repository
 
-Git - Download here
-
-Step-by-Step Setup
-
-1. Clone the Repository
-
+```bash
 git clone https://github.com/yourusername/study-group-api.git
 cd study-group-api
+```
 
-2. Open the Project
+#### 2. Open the Project
 
-Using Visual Studio:
+**Using Visual Studio:**
+- Open Visual Studio
+- Click `File` → `Open` → `Project/Solution`
+- Navigate to the project folder and select `ASP.NET Core Web API.sln`
 
-Open Visual Studio
-
-Click File → Open → Project/Solution
-
-Navigate to the project folder and select ASP.NET Core Web API.sln
-
-Using Command Line:
-
+**Using Command Line:**
+```bash
 dotnet sln open
+```
 
-3. Configure Database Connection
+#### 3. Configure Database Connection
 
-Edit appsettings.json in the project root:
+Edit `appsettings.json` in the project root:
 
+```json
 {
   "ConnectionStrings": {
 	"DefaultConnection": "Server=YOUR_SERVER_NAME;Database=StudyGroupDB;Trusted_Connection=true;TrustServerCertificate=true;"
@@ -104,63 +79,62 @@ Edit appsettings.json in the project root:
 	"ExpiryMinutes": 60
   }
 }
+```
 
-Important Notes:
+**Important Notes:**
+- Replace `YOUR_SERVER_NAME` with your SQL Server instance name
+- Change the `SecretKey` to a secure random string (minimum 32 characters)
+- Keep these values in a secure location, never commit to GitHub
 
-Replace YOUR_SERVER_NAME with your SQL Server instance name
-
-Change the SecretKey to a secure random string (minimum 32 characters)
-
-Keep these values in a secure location, never commit to GitHub
-
-4. Install Dependencies
+#### 4. Install Dependencies
 
 The NuGet packages will be restored automatically when you open the project in Visual Studio. To manually restore:
 
+```bash
 dotnet restore
+```
 
-5. Run Database Migrations
+#### 5. Run Database Migrations
 
-Using Package Manager Console in Visual Studio:
-
+**Using Package Manager Console in Visual Studio:**
+```powershell
 Update-Database
+```
 
-Using Command Line:
-
+**Using Command Line:**
+```bash
 dotnet ef database update
+```
 
 This will create all tables in SQL Server based on the Entity Framework Core migrations.
 
-6. Run the Project
+#### 6. Run the Project
 
-Using Visual Studio:
+**Using Visual Studio:**
+- Press `F5` or click the `Play` button
+- The API will open at `https://localhost:7259`
+- Swagger UI will be available at `https://localhost:7259/swagger`
 
-Press F5 or click the Play button
-
-The API will open at https://localhost:7259
-
-Swagger UI will be available at https://localhost:7259/swagger
-
-Using Command Line:
-
+**Using Command Line:**
+```bash
 dotnet run
+```
 
-🔐 Authentication Guide
+---
 
-User Registration Flow
+## 🔐 Authentication Guide
 
-New users register with email and password
+### User Registration Flow
 
-Admin approval required - User account is created but not approved
+1. **New users register** with email and password
+2. **Admin approval required** - User account is created but not approved
+3. **Admin approves user** - User receives approval notification
+4. **User can now login** and obtain JWT token
 
-Admin approves user - User receives approval notification
+### How to Register
 
-User can now login and obtain JWT token
-
-How to Register
-
-Request:
-
+**Request:**
+```bash
 POST /api/Users/register
 Content-Type: application/json
 
@@ -169,9 +143,10 @@ Content-Type: application/json
   "password": "SecurePassword123!",
   "name": "John Doe"
 }
+```
 
-Response (201 Created):
-
+**Response (201 Created):**
+```json
 {
   "message": "User registered successfully. Awaiting admin approval.",
   "user": {
@@ -181,19 +156,18 @@ Response (201 Created):
 	"isApproved": false
   }
 }
+```
 
-Admin Approval System
+### Admin Approval System
 
-New users cannot perform authenticated actions until approved
+- New users cannot perform authenticated actions until approved
+- Admins can approve/reject users via `/api/Users/{id}/approve` endpoint
+- Once approved, users can login and receive JWT tokens
 
-Admins can approve/reject users via /api/Users/{id}/approve endpoint
+### How to Login
 
-Once approved, users can login and receive JWT tokens
-
-How to Login
-
-Request:
-
+**Request:**
+```bash
 POST /api/Users/login
 Content-Type: application/json
 
@@ -201,9 +175,10 @@ Content-Type: application/json
   "email": "user@example.com",
   "password": "SecurePassword123!"
 }
+```
 
-Response (200 OK):
-
+**Response (200 OK):**
+```json
 {
   "message": "Login successful",
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -214,31 +189,26 @@ Response (200 OK):
 	"role": "User"
   }
 }
+```
 
-Using JWT Token in Swagger
+### Using JWT Token in Swagger
 
-Click the "Authorize" button in Swagger UI (top-right)
+1. Click the **"Authorize"** button in Swagger UI (top-right)
+2. Paste your token in the format: `Bearer YOUR_TOKEN_HERE`
+3. Click **"Authorize"** and then **"Close"**
+4. All subsequent requests will include the token automatically
 
-Paste your token in the format: Bearer YOUR_TOKEN_HERE
+### Using JWT Token in Postman
 
-Click "Authorize" and then "Close"
+1. Create a new request in Postman
+2. Go to the **"Authorization"** tab
+3. Select **"Bearer Token"** from the Type dropdown
+4. Paste your token in the **"Token"** field
+5. Send the request
 
-All subsequent requests will include the token automatically
+### Using JWT Token with Fetch API (Frontend)
 
-Using JWT Token in Postman
-
-Create a new request in Postman
-
-Go to the "Authorization" tab
-
-Select "Bearer Token" from the Type dropdown
-
-Paste your token in the "Token" field
-
-Send the request
-
-Using JWT Token with Fetch API (Frontend)
-
+```javascript
 const token = "your-jwt-token-here";
 
 fetch('https://localhost:7259/api/StudyGroups', {
@@ -250,283 +220,70 @@ fetch('https://localhost:7259/api/StudyGroups', {
 })
 .then(response => response.json())
 .then(data => console.log(data));
+```
 
-👨‍💻 API Endpoints Overview
+---
 
-Authentication Endpoints
+## 👨‍💻 API Endpoints Overview
 
-Method
+### Authentication Endpoints
 
-Endpoint
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---|
+| POST | `/api/Users/register` | Register new user | ❌ No |
+| POST | `/api/Users/login` | Login and get JWT token | ❌ No |
 
-Description
+### User Management Endpoints
 
-Auth Required
+| Method | Endpoint | Description | Auth Required | Role |
+|--------|----------|-------------|---|---|
+| GET | `/api/Users` | Get all users | ✅ Yes | Admin |
+| GET | `/api/Users/{id}` | Get user by ID | ✅ Yes | - |
+| PUT | `/api/Users/{id}/approve` | Approve/reject user | ✅ Yes | Admin |
 
-POST
+### Study Groups Endpoints
 
-/api/Users/register
+| Method | Endpoint | Description | Auth Required | Role |
+|--------|----------|-------------|---|---|
+| GET | `/api/StudyGroups` | Get all approved study groups | ❌ No | - |
+| GET | `/api/StudyGroups/{id}` | Get study group by ID | ❌ No | - |
+| POST | `/api/StudyGroups` | Create new study group | ✅ Yes | User |
+| PUT | `/api/StudyGroups/{id}` | Update study group | ✅ Yes | Owner/Admin |
+| PUT | `/api/StudyGroups/{id}/approve` | Approve study group | ✅ Yes | Admin |
+| DELETE | `/api/StudyGroups/{id}` | Delete study group | ✅ Yes | Owner/Admin |
+| GET | `/api/StudyGroups/owner/my-groups` | Get current user's groups | ✅ Yes | User |
+| GET | `/api/StudyGroups/search` | Search study groups | ❌ No | - |
+| GET | `/api/StudyGroups/{id}/members` | Get group members | ❌ No | - |
 
-Register new user
+### Study Group Members Endpoints
 
-❌ No
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---|
+| POST | `/api/JoinRequests` | Request to join group | ✅ Yes |
+| GET | `/api/JoinRequests` | Get join requests | ✅ Yes |
+| PUT | `/api/JoinRequests/{id}/approve` | Approve join request | ✅ Yes |
 
-POST
+### Materials Endpoints
 
-/api/Users/login
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---|
+| POST | `/api/Materials` | Add material to study group | ✅ Yes |
+| GET | `/api/Materials/{groupId}` | Get materials for group | ❌ No |
+| DELETE | `/api/Materials/{id}` | Delete material | ✅ Yes |
 
-Login and get JWT token
+### Comments Endpoints
 
-❌ No
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---|
+| POST | `/api/Comments` | Add comment to group | ✅ Yes |
+| GET | `/api/Comments/{groupId}` | Get comments for group | ❌ No |
+| DELETE | `/api/Comments/{id}` | Delete comment | ✅ Yes |
 
-User Management Endpoints
+---
 
-Method
+## 🧩 Project Structure
 
-Endpoint
-
-Description
-
-Auth Required
-
-Role
-
-GET
-
-/api/Users
-
-Get all users
-
-✅ Yes
-
-Admin
-
-GET
-
-/api/Users/{id}
-
-Get user by ID
-
-✅ Yes
-
--
-
-PUT
-
-/api/Users/{id}/approve
-
-Approve/reject user
-
-✅ Yes
-
-Admin
-
-Study Groups Endpoints
-
-Method
-
-Endpoint
-
-Description
-
-Auth Required
-
-Role
-
-GET
-
-/api/StudyGroups
-
-Get all approved study groups
-
-❌ No
-
--
-
-GET
-
-/api/StudyGroups/{id}
-
-Get study group by ID
-
-❌ No
-
--
-
-POST
-
-/api/StudyGroups
-
-Create new study group
-
-✅ Yes
-
-User
-
-PUT
-
-/api/StudyGroups/{id}
-
-Update study group
-
-✅ Yes
-
-Owner/Admin
-
-PUT
-
-/api/StudyGroups/{id}/approve
-
-Approve study group
-
-✅ Yes
-
-Admin
-
-DELETE
-
-/api/StudyGroups/{id}
-
-Delete study group
-
-✅ Yes
-
-Owner/Admin
-
-GET
-
-/api/StudyGroups/owner/my-groups
-
-Get current user's groups
-
-✅ Yes
-
-User
-
-GET
-
-/api/StudyGroups/search
-
-Search study groups
-
-❌ No
-
--
-
-GET
-
-/api/StudyGroups/{id}/members
-
-Get group members
-
-❌ No
-
--
-
-Study Group Members Endpoints
-
-Method
-
-Endpoint
-
-Description
-
-Auth Required
-
-POST
-
-/api/JoinRequests
-
-Request to join group
-
-✅ Yes
-
-GET
-
-/api/JoinRequests
-
-Get join requests
-
-✅ Yes
-
-PUT
-
-/api/JoinRequests/{id}/approve
-
-Approve join request
-
-✅ Yes
-
-Materials Endpoints
-
-Method
-
-Endpoint
-
-Description
-
-Auth Required
-
-POST
-
-/api/Materials
-
-Add material to study group
-
-✅ Yes
-
-GET
-
-/api/Materials/{groupId}
-
-Get materials for group
-
-❌ No
-
-DELETE
-
-/api/Materials/{id}
-
-Delete material
-
-✅ Yes
-
-Comments Endpoints
-
-Method
-
-Endpoint
-
-Description
-
-Auth Required
-
-POST
-
-/api/Comments
-
-Add comment to group
-
-✅ Yes
-
-GET
-
-/api/Comments/{groupId}
-
-Get comments for group
-
-❌ No
-
-DELETE
-
-/api/Comments/{id}
-
-Delete comment
-
-✅ Yes
-
-🧩 Project Structure
-
+```
 ASP.NET Core Web API/
 ├── Controllers/                    # API endpoint handlers
 │   ├── UsersController.cs
@@ -565,87 +322,73 @@ ASP.NET Core Web API/
 ├── appsettings.Development.json   # Development settings
 └── README.md                       # This file
 
+```
 
-Folder Descriptions
+### Folder Descriptions
 
-Controllers - Handle HTTP requests and responses. Each controller manages a specific domain (Users, StudyGroups, etc.)
+- **Controllers** - Handle HTTP requests and responses. Each controller manages a specific domain (Users, StudyGroups, etc.)
+- **Models** - Entity Framework Core entity classes that represent database tables
+- **DTOs** - Data Transfer Objects used for API requests and responses. These protect internal models from external exposure
+- **Data** - Contains AppDbContext which configures the database and entity relationships
+- **Services** - Contains business logic, authentication logic, and utility functions
+- **Migrations** - Contains database migration files for version control of database schema changes
 
-Models - Entity Framework Core entity classes that represent database tables
-
-DTOs - Data Transfer Objects used for API requests and responses. These protect internal models from external exposure
-
-Data - Contains AppDbContext which configures the database and entity relationships
-
-Services - Contains business logic, authentication logic, and utility functions
-
-Migrations - Contains database migration files for version control of database schema changes
+---
 
 
 
-🔒 Security Checklist
+## 🔒 Security Checklist
 
-JWT Secret key is changed and secured
+- [ ] JWT Secret key is changed and secured
+- [ ] SQL connection string has no exposed credentials
+- [ ] HTTPS is enabled in production
+- [ ] CORS is properly configured
+- [ ] Sensitive data is not logged
+- [ ] Input validation is implemented
+- [ ] Authorization checks are in place
+- [ ] Secrets are in environment variables, not in code
+- [ ] Database migrations are run before deployment
+- [ ] Admin approval is required for user activation
 
-SQL connection string has no exposed credentials
+---
 
-HTTPS is enabled in production
+## 🤝 Contributing
 
-CORS is properly configured
+1. Create a feature branch
+2. Make your changes
+3. Push and create a Pull Request
+4. Wait for code review
+5. Address feedback
+6. Merge when approved
 
-Sensitive data is not logged
+---
 
-Input validation is implemented
-
-Authorization checks are in place
-
-Secrets are in environment variables, not in code
-
-Database migrations are run before deployment
-
-Admin approval is required for user activation
-
-🤝 Contributing
-
-Create a feature branch
-
-Make your changes
-
-Push and create a Pull Request
-
-Wait for code review
-
-Address feedback
-
-Merge when approved
-
-📞 Support & Contact
+## 📞 Support & Contact
 
 For questions or issues:
+- Create an issue on GitHub
+- Contact the development team
+- Review API documentation at `/swagger`
 
-Create an issue on GitHub
+---
 
-Contact the development team
-
-Review API documentation at /swagger
-
-📄 License
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-🎯 Roadmap
+---
 
-Email verification for user registration
+## 🎯 Roadmap
 
-Study group ratings and reviews
+- [ ] Email verification for user registration
+- [ ] Study group ratings and reviews
+- [ ] File upload for study materials
+- [ ] Real-time notifications
+- [ ] Mobile app integration
+- [ ] Advanced search filters
+- [ ] Study group calendar integration
 
-File upload for study materials
+---
 
-Real-time notifications
-
-Mobile app integration
-
-Advanced search filters
-
-Study group calendar integration
-
-Last Updated: May 2026Maintained By: Development Team
+**Last Updated:** May 2026  
+**Maintained By:** Development Team
