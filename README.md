@@ -6,23 +6,7 @@
 
 ---
 
-# 📌 Project Overview
 
-Study Group API is a backend REST API built using ASP.NET Core Web API and SQL Server.  
-The system allows students to browse study groups, group creators to manage study groups, and admins to manage approvals and system access.
-
-The project implements authentication, authorization, role-based access control, join requests, comments, and study materials management using JWT authentication.
-
----
-
-# ✨ Main Features
-
-- ✅ JWT Authentication & Authorization
-- ✅ Role-Based Access Control
-- ✅ Three System Roles:
-  - Admin# Study Group API - ASP.NET Core Web API
-
-![.NET 8](https://img.shields.io/badge/.NET-8.0-blue) ![SQL Server](https://img.shields.io/badge/Database-SQL%20Server-red) ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## 📌 Project Overview
 
