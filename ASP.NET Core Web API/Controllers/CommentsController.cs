@@ -5,6 +5,8 @@ using ASP.NET_Core_Web_API.DTOs;
 using ASP.NET_Core_Web_API.Services;
 using ASP.NET_Core_Web_API.Interfaces;
 using ASP.NET_Core_Web_API.Enums;
+using Microsoft.AspNetCore.SignalR;
+using ASP.NET_Core_Web_API.Hubs;
 
 namespace ASP.NET_Core_Web_API.Controllers
 {
@@ -14,11 +16,13 @@ namespace ASP.NET_Core_Web_API.Controllers
     {
         private readonly ICommentService _commentService;
         private readonly AuthService _authService;
+        private readonly IHubContext<StudyGroupHub> _hubContext;
 
-        public CommentsController(ICommentService commentService, AuthService authService)
+        public CommentsController(ICommentService commentService, AuthService authService, IHubContext<StudyGroupHub> hubContext)
         {
             _commentService = commentService;
             _authService = authService;
+            _hubContext = hubContext;
         }
 
         
@@ -62,6 +66,9 @@ namespace ASP.NET_Core_Web_API.Controllers
 
             if (comment == null)
                 return BadRequest(new { message = "Failed to create comment" });
+
+            await _hubContext.Clients.Group(studyGroupId.ToString())
+                .SendAsync("ReceiveComment", comment);
 
             return CreatedAtAction(nameof(GetCommentById), new { id = comment.ID }, comment);
         }

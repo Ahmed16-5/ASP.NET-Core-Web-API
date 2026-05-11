@@ -2,6 +2,7 @@ using ASP.NET_Core_Web_API.Data;
 using ASP.NET_Core_Web_API.Services;
 using ASP.NET_Core_Web_API.Interfaces;
 using ASP.NET_Core_Web_API.Repositories;
+using ASP.NET_Core_Web_API.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -32,6 +33,7 @@ namespace ASP.NET_Core_Web_API
             builder.Services.AddScoped<IMaterialService, MaterialService>();
             builder.Services.AddScoped<ICommentService, CommentService>();
             builder.Services.AddScoped<IJoinRequestService, JoinRequestService>();
+            builder.Services.AddSignalR();
 
             // CORS - React only
             builder.Services.AddCors(options =>
@@ -43,7 +45,8 @@ namespace ASP.NET_Core_Web_API
                             "http://localhost:5173"
                         )
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
 
@@ -145,6 +148,7 @@ namespace ASP.NET_Core_Web_API
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHub<StudyGroupHub>("/hubs/studygroup");
 
             app.Run();
         }
