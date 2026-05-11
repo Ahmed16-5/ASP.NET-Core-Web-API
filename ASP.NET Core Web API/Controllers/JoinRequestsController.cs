@@ -5,6 +5,8 @@ using ASP.NET_Core_Web_API.DTOs;
 using ASP.NET_Core_Web_API.Services;
 using ASP.NET_Core_Web_API.Interfaces;
 using ASP.NET_Core_Web_API.Enums;
+using Microsoft.AspNetCore.SignalR;
+using ASP.NET_Core_Web_API.Hubs;
 
 namespace ASP.NET_Core_Web_API.Controllers
 {
@@ -15,11 +17,13 @@ namespace ASP.NET_Core_Web_API.Controllers
     {
         private readonly IJoinRequestService _joinRequestService;
         private readonly AuthService _authService;
+        private readonly IHubContext<StudyGroupHub> _hubContext;
 
-        public JoinRequestsController(IJoinRequestService joinRequestService, AuthService authService)
+        public JoinRequestsController(IJoinRequestService joinRequestService, AuthService authService, IHubContext<StudyGroupHub> hubContext)
         {
             _joinRequestService = joinRequestService;
             _authService = authService;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -62,6 +66,9 @@ namespace ASP.NET_Core_Web_API.Controllers
                 {
                     message = "You are already a member of this group or have a pending request"
                 });
+
+                await _hubContext.Clients.Group(sendDto.StudyGroupID.ToString())
+                    .SendAsync("ReceiveJoinRequest", joinRequest);
 
             return CreatedAtAction(nameof(GetJoinRequestById),
                 new { id = joinRequest.ID },
